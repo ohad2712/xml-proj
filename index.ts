@@ -24,38 +24,50 @@
 
   
   interface FormInputs {
-    email: string,
-    password: string
+    id: string;
+    name: string;
+    rank: string; // TODO: add enum
+    base: string; // TODO: add enum
+    role: string;
+    suspect: {
+      id: string;
+      name: string;
+      rank: string; // TODO: add enum
+      unit: string;
+    }
   }
 
   // Array of example users for testing purposes
   const users = [
     {
-      id: 1,
+      id: '11111111',
       name: 'Maria Doe',
-      email: 'maria@example.com',
-      password: 'maria123'
+      rank: 'A',
+      base: '11',
+      role: 'a',
     },
     {
-      id: 2,
+      id: '222222222',
       name: 'Juan Doe',
-      email: 'juan@example.com',
-      password: 'juan123'
+      rank: 'B',
+      base: '22',
+      role: 'b',
     }
   ];
 
   // route login
   app.post('/login', (req: Request, res: Response) => {
-    const { email, password }:FormInputs = req.body;
+    const { id, name, rank, base, role, suspect } : FormInputs = req.body;
 
-    const user = users.find(user => {
-      return user.email === email && user.password === password
-    });
+    const user = { id, name, rank, base, role };
+    // const user = users.find(user => {
+    //   return user.name === name && user.rank === rank
+    // });
 
-    if (!user) {
-      return res.status(404).send('User Not Found!')
-    }
+    // if (!user) {
+    //   return res.status(404).send('User Not Found!')
+    // }
 
-    return res.status(200).json(user)
+    return res.status(200).json({user, suspect});
   });
   

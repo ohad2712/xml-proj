@@ -1,8 +1,7 @@
 
   export const getData = async <T>(
     url: string,
-    email: string,
-    password: string
+    { name, rank, base, role, id, suspect}: { name: string, rank: string, base: string, role: string, id: string, suspect: object },
   )
   : Promise<T> => {
     const res = await fetch(url, {
@@ -10,7 +9,7 @@
       headers: {
         'Content-type': 'application/json'
       },
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ name, rank, base, role, id, suspect }),
     });
 
     return await res.json();

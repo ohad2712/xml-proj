@@ -20,26 +20,29 @@ app.listen(port, () => {
 // Array of example users for testing purposes
 const users = [
     {
-        id: 1,
+        id: '11111111',
         name: 'Maria Doe',
-        email: 'maria@example.com',
-        password: 'maria123'
+        rank: 'A',
+        base: '11',
+        role: 'a',
     },
     {
-        id: 2,
+        id: '222222222',
         name: 'Juan Doe',
-        email: 'juan@example.com',
-        password: 'juan123'
+        rank: 'B',
+        base: '22',
+        role: 'b',
     }
 ];
 // route login
 app.post('/login', (req, res) => {
-    const { email, password } = req.body;
-    const user = users.find(user => {
-        return user.email === email && user.password === password;
-    });
-    if (!user) {
-        return res.status(404).send('User Not Found!');
-    }
-    return res.status(200).json(user);
+    const { id, name, rank, base, role, suspect } = req.body;
+    const user = { id, name, rank, base, role };
+    // const user = users.find(user => {
+    //   return user.name === name && user.rank === rank
+    // });
+    // if (!user) {
+    //   return res.status(404).send('User Not Found!')
+    // }
+    return res.status(200).json({ user, suspect });
 });
