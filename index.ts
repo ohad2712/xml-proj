@@ -1,8 +1,8 @@
 
   import dotenv from "dotenv";
   import express, { Express, Request, Response } from "express";
-  import path from "path";
   import cors from "cors";
+  import { jsPDF } from 'jspdf';
 
   dotenv.config();
 
@@ -34,32 +34,14 @@
       name: string;
       rank: string; // TODO: add enum
       unit: string;
-    }
+    },
+    signatureImage: any; // TODO: better type this
   }
 
-  // Array of example users for testing purposes
-  const users = [
-    {
-      id: '11111111',
-      name: 'Maria Doe',
-      rank: 'A',
-      base: '11',
-      role: 'a',
-    },
-    {
-      id: '222222222',
-      name: 'Juan Doe',
-      rank: 'B',
-      base: '22',
-      role: 'b',
-    }
-  ];
+  app.post('/generate', (req: Request, res: Response) => {
+    const { id, name, rank, base, role, suspect, signatureImage } : FormInputs = req.body;
 
-  // route login
-  app.post('/login', (req: Request, res: Response) => {
-    const { id, name, rank, base, role, suspect } : FormInputs = req.body;
-
-    const user = { id, name, rank, base, role };
+    const user = { id, name, rank, base, role, signatureImage };
     // const user = users.find(user => {
     //   return user.name === name && user.rank === rank
     // });
@@ -67,7 +49,26 @@
     // if (!user) {
     //   return res.status(404).send('User Not Found!')
     // }
+    console.log({user, suspect});
+    
+    const form = generatePdfForm(user, suspect);
 
+    form.save(`Form-${(new Date()).getDate()}.pdf`);
     return res.status(200).json({user, suspect});
   });
   
+  function generatePdfForm(user: any, suspect: any) {
+    createBasePdfStructure();
+
+    const form = new jsPDF();
+
+    form.text('Hello World!', 10, 10);
+    form.text(`ID: ${user.id}, Full Name: ${user.name}`, 20, 20);
+    form.text(`Suspect id: ${suspect.id}, Full Name: ${suspect.name}`, 20, 40);
+
+    return form;
+  }
+
+  function createBasePdfStructure() {
+
+  }

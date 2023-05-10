@@ -1,8 +1,8 @@
 
 import { useState, ChangeEvent, FormEvent } from "react";
-import { ReactComponent as Logo } from "./logo.svg";
 import { getData } from "./utils/data-utils";
 import FormInput from './components/form-input/form-input';
+import SignatureCanvas from 'react-signature-canvas';
 
 import './App.css';
 
@@ -37,7 +37,14 @@ const App = () => {
   // react hooks
   const [user, setUser] = useState<User | null>();
   const [formFields, setFormFields] = useState(defaultFormFields);
+  const [signatureCanvasRef, setSignatureCanvasRef] = useState(null);
   const { name, rank, base, role, id, suspect } = formFields;
+  let signatureImage: any; // TODO: better type this
+
+  const suspect_id = suspect.id;
+  const suspect_name = suspect.name;
+  const suspect_rank = suspect.rank;
+  const suspect_unit = suspect.unit;
 
   const resetFormFields = () => {
     return (
@@ -47,12 +54,32 @@ const App = () => {
 
   // handle input changes
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target
-    setFormFields({ ...formFields, [name]: value })
+    const { name, value } = event.target;
+
+    if (name.startsWith('suspect_')) {
+      // Update suspect object fields
+      const suspectFieldName = name.replace('suspect_', '');
+      setFormFields({
+        ...formFields,
+        suspect: {
+          ...formFields.suspect,
+          [suspectFieldName]: value
+        }
+      });
+    } else {
+      // Update top-level fields
+      setFormFields({ ...formFields, [name]: value });
+    }
   }
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
+    event.preventDefault();
+
+    // Set signature image
+    if (signatureCanvasRef) {
+      signatureImage = (signatureCanvasRef as any).toDataURL();
+      // Do something with the signature image (e.g., save it, display it, etc.)
+    }
 
     try {
       // Prepare payload
@@ -63,21 +90,30 @@ const App = () => {
         role,
         id,
         suspect,
-      }
+        signatureImage,
+      };
+
       // make the API call
       const res: User = await getData(
-        'http://localhost:8000/login', payload
+        'http://localhost:8000/generate', payload
       )
       setUser(res);
       resetFormFields()
     } catch (error) {
-      alert('User Sign In Failed');
+      alert('Something Failed');
     }
   };
 
   const reload = () => {
     setUser(null);
     resetFormFields()
+  };
+
+  const saveSignature = () => {
+    if (signatureCanvasRef) {
+      signatureImage = (signatureCanvasRef as any).toDataURL();
+      // Do something with the signature image (e.g., save it, display it, etc.)
+    }
   };
 
   return (
@@ -129,48 +165,49 @@ const App = () => {
             value={id}
             onChange={handleChange}
           />
-          {/* <div className="button-group">
-            <button type="submit">Sign In</button>
-            <span>
-              <button type="button" onClick={reload}>Clear</button>
-            </span>
-          </div> */}
-        </form>
 
-        <h2>Suspect Info</h2>
-        <form onSubmit={handleSubmit}>
+
+          <h2>Suspect Info</h2>
           <FormInput
             label="Full name"
             type="text"
             required
-            name="name"
-            value={suspect.name}
+            name="suspect_name"
+            value={suspect_name}
             onChange={handleChange}
           />
           <FormInput
             label="Personal ID"
             type="text"
             required
-            name="id"
-            value={suspect.id}
+            name="suspect_id"
+            value={suspect_id}
             onChange={handleChange}
           />
           <FormInput
             label="Rank"
             type='text' // TODO: Change to dropdown list
             required
-            name='rank'
-            value={suspect.rank}
+            name='suspect_rank'
+            value={suspect_rank}
             onChange={handleChange}
           />
           <FormInput
             label="Unit"
             type="text" // TODO: Change to dropdown list
             required
-            name="unit"
-            value={suspect.unit}
+            name="suspect_unit"
+            value={suspect_unit}
             onChange={handleChange}
           />
+
+          <div className="signature">
+            <SignatureCanvas
+              ref={(ref: any) => setSignatureCanvasRef(ref)}
+              canvasProps={{ width: 200, height: 100, className: 'signature-canvas' }}
+            />
+          </div>
+
 
           {/* TODO: add signature element */}
           <div className="button-group">
@@ -180,8 +217,8 @@ const App = () => {
             </span>
           </div>
         </form>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 }
 

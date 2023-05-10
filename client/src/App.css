@@ -47,3 +47,7 @@ button:hover {
   color: black;
   border: 1px solid #7ce2ff;
 }
+
+.signature {
+  background-color: whitesmoke;
+}
