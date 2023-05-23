@@ -29,7 +29,7 @@ app.post('/generate', (req, res) => {
     // }
     console.log({ user, suspect });
     const form = generatePdfForm(user, suspect);
-    form.save(`Form-${(new Date()).getDate()}.pdf`);
+    form.save(`Form-${(new Date()).getTime()}.pdf`);
     return res.status(200).json({ user, suspect });
 });
 function generatePdfForm(user, suspect) {
@@ -38,6 +38,7 @@ function generatePdfForm(user, suspect) {
     form.text('Hello World!', 10, 10);
     form.text(`ID: ${user.id}, Full Name: ${user.name}`, 20, 20);
     form.text(`Suspect id: ${suspect.id}, Full Name: ${suspect.name}`, 20, 40);
+    form.addImage(user.signatureImage, 'png', 60, 60);
     return form;
 }
 function createBasePdfStructure() {

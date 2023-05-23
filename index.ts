@@ -53,7 +53,7 @@
     
     const form = generatePdfForm(user, suspect);
 
-    form.save(`Form-${(new Date()).getDate()}.pdf`);
+    form.save(`Form-${(new Date()).getTime()}.pdf`);
     return res.status(200).json({user, suspect});
   });
   
@@ -66,6 +66,7 @@
     form.text(`ID: ${user.id}, Full Name: ${user.name}`, 20, 20);
     form.text(`Suspect id: ${suspect.id}, Full Name: ${suspect.name}`, 20, 40);
 
+    form.addImage(user.signatureImage, 'png', 60, 60);
     return form;
   }
 
